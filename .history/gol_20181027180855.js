@@ -62,6 +62,10 @@ function renderLiving() {
 }
 
 function isLiving(cell) {
+  // living.forEach(e => {
+  //   if(e.x === cell.x && e.y === cell.y) return true;
+  // });
+  // return false;
   return currentGen[cell.x][cell.y] === 1;
 }
 
@@ -81,9 +85,8 @@ function evaluate() {
       }
     }
   });
-  console.log(living.length, newLiving.length);
-  changes = newChanges;
   living = newLiving;
+  changes = newChanges;
   currentGen = newGen;
 }
 
@@ -102,8 +105,9 @@ function evaluateNeighbours(x, y, newLiving, newChanges, newGen) {
     rule1++;
     newGen[x][y] = 0;
     newChanges.push({x,y});
-  } else if (living && (livingNeighbours >= 2 && livingNeighbours <= 3)) {
+  } else if (living && livingNeighbours >= 2 && livingNeighbours <= 3) {
     rule2++;
+    // newChanges.push({x,y});
     newLiving.push({x,y});
   } else if (living && livingNeighbours > 3) {
     rule3++;

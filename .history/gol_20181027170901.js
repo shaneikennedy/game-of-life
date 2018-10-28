@@ -1,10 +1,6 @@
 let living = [];
 let currentGen = [];
 let changes = [];
-let rule1 = 0;
-let rule2 = 0;
-let rule3 = 0;
-let rule4 = 0;
 
 window.onload = () => {
   canv = document.getElementById("gc");
@@ -20,8 +16,6 @@ function gol() {
 
   // TODO evaluate life forms
   evaluate();
-  console.log(rule1, rule2, rule3, rule4)
-  rule1 = rule2 = rule3 = rule4 = 0;
 
   //render new data
   renderLiving();
@@ -30,18 +24,18 @@ function gol() {
 // populates the canvas with the initial living, random for now
 function init() {
   // living initialization
-  for (let i = 0; i < 20000; i++) {
+  for (let i = 0; i < 100; i++) {
     living.push({
-      x: Math.round(Math.random() * 200 + 200),
-      y: Math.round(Math.random() * 200 + 200),
+      x: Math.round(Math.random() * 10 + 200),
+      y: Math.round(Math.random() * 10 + 200),
     });
   }
 
   // Grid initialization
   let row = [];
-  row.length = 1000;
-  for (let i = 0; i < 1000; i++) {
-    row.fill(0, 0, 999)
+  row.length = 400;
+  for (let i = 0; i < 400; i++) {
+    row.fill(0, 0, 399)
     currentGen.push(row.map(e => e));
   }
 
@@ -57,12 +51,15 @@ function init() {
 function renderLiving() {
   living.forEach(coord => {
     ctx.fillStyle = 'lime';
-    ctx.fillRect(coord.x, coord.y, 5, 5);
+    ctx.fillRect(coord.x, coord.y, 1, 1);
   });
 }
 
 function isLiving(cell) {
-  return currentGen[cell.x][cell.y] === 1;
+  living.forEach(e => {
+    if(e.x === cell.x && e.y === cell.y) return true;
+  });
+  return false;
 }
 
 function evaluate() {
@@ -72,47 +69,46 @@ function evaluate() {
   // represents the next generation 
   let newGen = currentGen.slice(0);
   changes.forEach(e => {
+    console.log('here');
     const x = e.x;
     const y = e.y;
     // need to check the 8 elements surrounding the living at x,y
     for (let i = x - 1; i <= x + 1; i++) {
       for (let j = y - 1; j <= y + 1; j++) {
-        evaluateNeighbours(i, j, newLiving, newChanges, newGen);
+        evaluateNeighbours({x:i,y:j}, newLiving, newChanges, newGen);
       }
     }
   });
-  console.log(living.length, newLiving.length);
-  changes = newChanges;
   living = newLiving;
+  changes = newChanges;
   currentGen = newGen;
 }
 
-function evaluateNeighbours(x, y, newLiving, newChanges, newGen) {
+function evaluateNeighbours(coord, newLiving, newChanges, newGen) {
   let livingNeighbours = 0;
-  for (let i = x - 1; i <= x + 1; i++) {
-    for (let j = y - 1; j <= y + 1; j++) {
-      if (i !== x && j !== y) {
-        livingNeighbours += currentGen[i][j];
+  for (let i = coord.x - 1; i <= coord.x + 1; i++) {
+    for (let j = coord.y - 1; j <= coord.y + 1; j++) {
+      if (i !== coord.x && j !== coord.y) {
+        if (currentGen[i][j] === 1) {
+          livingNeighbours += 1;
+        }
       }
     }
   } 
   // Rules check
-  const living = isLiving({x,y});
+  const living = isLiving(coord);
   if (living && livingNeighbours < 2) {
-    rule1++;
-    newGen[x][y] = 0;
-    newChanges.push({x,y});
-  } else if (living && (livingNeighbours >= 2 && livingNeighbours <= 3)) {
-    rule2++;
-    newLiving.push({x,y});
+    newGen[coord.x][coord.y] = 0;
+    newChanges.push(coord);
+  } else if (living && livingNeighbours >= 2 && livingNeighbours <= 3) {
+    newChanges.push(coord);
+    newLiving.push(coord);
   } else if (living && livingNeighbours > 3) {
-    rule3++;
-    newGen[x][y] = 0;
-    newChanges.push({x: x, y: y});                
+    newGen[coord.x][coord.y] = 0;
+    newChanges.push({x: coord.x, y: coord.y});                
   } else if (!living && livingNeighbours === 3) {
-    rule4++;
-    newGen[x][y] = 1;
-    newChanges.push({x,y});
-    newLiving.push({x,y});
+    newGen[coord.x][coord.y] = 1;
+    newChanges.push(coord);
+    newLiving.push(coord);
   }
 }

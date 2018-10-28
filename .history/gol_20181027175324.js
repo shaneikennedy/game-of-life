@@ -30,18 +30,18 @@ function gol() {
 // populates the canvas with the initial living, random for now
 function init() {
   // living initialization
-  for (let i = 0; i < 20000; i++) {
+  for (let i = 0; i < 500; i++) {
     living.push({
-      x: Math.round(Math.random() * 200 + 200),
-      y: Math.round(Math.random() * 200 + 200),
+      x: Math.round(Math.random() * 25 + 200),
+      y: Math.round(Math.random() * 25 + 200),
     });
   }
 
   // Grid initialization
   let row = [];
-  row.length = 1000;
-  for (let i = 0; i < 1000; i++) {
-    row.fill(0, 0, 999)
+  row.length = 400;
+  for (let i = 0; i < 400; i++) {
+    row.fill(0, 0, 399)
     currentGen.push(row.map(e => e));
   }
 
@@ -57,11 +57,15 @@ function init() {
 function renderLiving() {
   living.forEach(coord => {
     ctx.fillStyle = 'lime';
-    ctx.fillRect(coord.x, coord.y, 5, 5);
+    ctx.fillRect(coord.x, coord.y, 1, 1);
   });
 }
 
 function isLiving(cell) {
+  // living.forEach(e => {
+  //   if(e.x === cell.x && e.y === cell.y) return true;
+  // });
+  // return false;
   return currentGen[cell.x][cell.y] === 1;
 }
 
@@ -81,9 +85,8 @@ function evaluate() {
       }
     }
   });
-  console.log(living.length, newLiving.length);
-  changes = newChanges;
   living = newLiving;
+  changes = newChanges;
   currentGen = newGen;
 }
 
@@ -102,8 +105,9 @@ function evaluateNeighbours(x, y, newLiving, newChanges, newGen) {
     rule1++;
     newGen[x][y] = 0;
     newChanges.push({x,y});
-  } else if (living && (livingNeighbours >= 2 && livingNeighbours <= 3)) {
+  } else if (living && livingNeighbours >= 2 && livingNeighbours <= 3) {
     rule2++;
+    // newChanges.push({x,y});
     newLiving.push({x,y});
   } else if (living && livingNeighbours > 3) {
     rule3++;
