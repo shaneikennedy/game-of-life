@@ -22,18 +22,21 @@ window.onload = () => {
 }
 
 function gol() {
-  //render backgroud
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canv.width, canv.height);
+  // continue only if no overflow
+  if (!(living.length > 50000)) {
+    //render backgroud
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
 
-  evaluate();
-  // console.log(rule1, rule2, rule3, rule4)
-  rule1 = rule2 = rule3 = rule4 = 0;
+    evaluate();
+    // console.log(rule1, rule2, rule3, rule4)
+    rule1 = rule2 = rule3 = rule4 = 0;
 
-  //render new data
-  renderLiving(); 
+    //render new data
+    renderLiving(); 
 
-  debug_box.innerHTML = JSON.stringify(living);
+    debug_box.innerHTML = JSON.stringify(living);
+  }
 };
 
 // populates the canvas with the initial living, random for now
