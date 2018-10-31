@@ -1,6 +1,13 @@
+/* Globals */
+
+// list of living cells for a given generation
 let living = [];
+// grid that represents the latest generation
 let currentGen = [];
+// changes that occured in a given generation
 let changes = [];
+
+/* Rule Counters */
 let rule1 = 0;
 let rule2 = 0;
 let rule3 = 0;
@@ -9,6 +16,7 @@ let rule4 = 0;
 window.onload = () => {
   canv = document.getElementById("gc");
   ctx = canv.getContext("2d");
+  debug_box = document.getElementById("debug");
   init();
   setInterval(gol, 1000); //render 4 times/sec
 }
@@ -18,13 +26,14 @@ function gol() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canv.width, canv.height);
 
-  // TODO evaluate life forms
   evaluate();
-  //console.log(rule1, rule2, rule3, rule4)
+  // console.log(rule1, rule2, rule3, rule4)
   rule1 = rule2 = rule3 = rule4 = 0;
 
   //render new data
-  renderLiving();
+  renderLiving(); 
+
+  debug_box.innerHTML = JSON.stringify(living);
 };
 
 // populates the canvas with the initial living, random for now
@@ -50,8 +59,12 @@ function init() {
     currentGen[e.x][e.y] = 1;
   });
 
+  console.log('living length: ' + living.length);
+
   //initialize changes, during initialization all living ones are the changes
   changes = living.map(e => e);
+
+  console.log('changes length: ' + changes.length);
 }
 
 function renderLiving() {
@@ -80,6 +93,7 @@ function evaluate() {
         evaluateNeighbours(i, j, newLiving, newChanges, newGen);
       }
     }
+    // console.log(rule1, rule2, rule3, rule4);    
   });
   console.log(living.length, newLiving.length);
   changes = newChanges;
@@ -104,7 +118,7 @@ function evaluateNeighbours(x, y, newLiving, newChanges, newGen) {
     newChanges.push({x,y});
   } else if (cellIsAlive && (livingNeighbours >= 2 && livingNeighbours <= 3)) {
     rule2++;
-    newLiving.push({x,y});
+    if (!newLiving.includes({x,y})) newLiving.push({x,y});
   } else if (cellIsAlive && livingNeighbours > 3) {
     rule3++;
     newGen[x][y] = 0;
@@ -113,6 +127,8 @@ function evaluateNeighbours(x, y, newLiving, newChanges, newGen) {
     rule4++;
     newGen[x][y] = 1;
     newChanges.push({x,y});
-    newLiving.push({x,y});
+    if (!newLiving.includes({x,y})) newLiving.push({x,y});
   }
+
+  return newLiving;
 }
